@@ -46,7 +46,7 @@ export const demoRegular = {
     "ShowRoundOff": 1,
     "HSNSASummaryTable": 1,
     "InvoiceDescription": 1,
-    "RegularInvoiceSignatureFileName": "thex-null-1720092402953-Jon_Kirsch's_Signature.jpg",
+    "RegularInvoiceSignatureFileName": "https://ledgerx365beta.s3.amazonaws.com/thex-1725520613902-WhatsApp Image 2024-07-27 at 10.20.35.jpeg",
     "LastUpdatedBy": null,
     "StatusCode": null,
     "StatusMessage": null,

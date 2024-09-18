@@ -66,7 +66,7 @@ export function drawTableWithOuterBorder(doc, data, startX, startY, columnWidths
   const columnWidthPercentages = columnWidths.map(width => (width / totalColumnWidth) * availableWidth);
 
   // Vertical centering for header text (adjust Y to center in the row)
-  const headerVerticalOffset = (rowHeight - doc.heightOfString('A', { fontSize: 12 })) / 2 +5
+  const headerVerticalOffset = (rowHeight - doc.heightOfString('A', { fontSize: 12 })) / 2 + 5
 
   // Set line width (narrow border)
   doc.lineWidth(borderWidth);
@@ -125,57 +125,99 @@ export async function drawQR(doc, InvoiceSettings, margin) {
   const textXPosition = xPosition - 100;  // Adjust the value 100 based on how far left you want the text to be
 
   // Add the text vertically centered with the QR code
-  doc.font('Helvetica').fontSize(12).text('Payment QR', textXPosition, qrYCenter - 6); 
-  doc.font('Helvetica').fontSize(12).text('ananda@ybl', textXPosition, qrYCenter +6);  // Adjust -6 for better vertical centering
-   // Adjust -6 for better vertical centering
+  doc.font('Helvetica-Bold').fontSize(12).text('Bank Details', margin, doc.y);
+  doc.font('Helvetica').fontSize(12).text('SBI KALOOR', margin, doc.y);  // Adjust -6 for better vertical centering
+  doc.font('Helvetica').fontSize(12).text('IFSC SBIN838383', margin, doc.y);  // Adjust -6 for better vertical centering
+  doc.font('Helvetica').fontSize(12).text('PINCODE 8383838', margin, doc.y);  // Adjust -6 for better vertical centering
+  // Adjust -6 for better vertical centering
+  doc.font('Helvetica').fontSize(12).text('Payment QR', textXPosition, qrYCenter - 6);
+  doc.font('Helvetica').fontSize(12).text('ananda@y2bl', textXPosition, qrYCenter + 6);  // Adjust -6 for better vertical centering
+
+  // Adjust -6 for better vertical centering
 }
 
 
-export const uploadToServer = (uploadedFile, fileName, fileType) => {
+export const uploadToServer = async(uploadedFile, fileName, fileType,demoRegular) => {
   return new Promise((resolve, reject) => {
-      console.log(process.env.REACT_APP_FILE_UPLOAD_URL)
-      try {
-          let data = "";
-          let config = {
-              method: "post",
-              url: `https://b7gihkrd57faaumq2f3gknp7na0imivy.lambda-url.ap-south-1.on.aws?filename=${fileName}&contentType=${fileType}`,
-              // url: `https://xd8ts5ub3e.execute-api.us-east-1.amazonaws.com/Prod/api/PreSigned/PreSignedUrl?filename=${uploadedFile.name}&contentType=${uploadedFile.type}`,
-              headers: {},
-              data: data,
+    console.log(process.env.REACT_APP_FILE_UPLOAD_URL)
+    try {
+      let data = "";
+      let config = {
+        method: "post",
+        url: `https://b7gihkrd57faaumq2f3gknp7na0imivy.lambda-url.ap-south-1.on.aws?filename=${fileName}&contentType=${fileType}`,
+        // url: `https://xd8ts5ub3e.execute-api.us-east-1.amazonaws.com/Prod/api/PreSigned/PreSignedUrl?filename=${uploadedFile.name}&contentType=${uploadedFile.type}`,
+        headers: {},
+        data: data,
+      };
+      // console.log('config', config);
+      axios(config)
+        .then(function (response) {
+          console.log("res :::: ", response.data);
+          let config2 = {
+            method: "put",
+            url: response.data.signedUrl,
+            headers: {
+              "Content-Type": `${fileType}`,
+            },
+            data: uploadedFile,
           };
-          // console.log('config', config);
-          axios(config)
-              .then(function (response) {
-                  console.log("res :::: ", response.data);
-                  let config2 = {
-                      method: "put",
-                      url: response.data.signedUrl,
-                      headers: {
-                          "Content-Type": `${fileType}`,
-                      },
-                      data: uploadedFile,
-                  };
-                  console.log('config2', config2);
-                  axios(config2)
-                      .then(function (res) {
-                          resolve(res)
-                          console.log('res in upload :::: ', JSON.stringify(res.data));
-                      })
-                      .catch(function (error) {
-                          console.log("error in upload ::: ", error);
-                          reject()
-                      });
-              })
-              .catch(function (error) {
-                  console.log("errr ::: ", error);
-                  reject()
-              });
-      } catch (e) {
-          console.log("error ::: ", e);
+          console.log('config2', config2);
+          axios(config2)
+            .then(function (res) {
+              resolve(res)
+              console.log('res in upload :::: ', JSON.stringify(res.data));
+            })
+            .catch(function (error) {
+              console.log("error in upload ::: ", error);
+              reject()
+            });
+        })
+        .catch(function (error) {
+          console.log("errr ::: ", error);
           reject()
-      }
+        });
+    } catch (e) {
+      console.log("error ::: ", e);
+      reject()
+    }
   })
 
 }
+export const drawFooter =async (doc, InvoiceSettings, margin) => {
+  let companyName = "Xcompany"
+  const textWidth = doc.widthOfString(companyName);
+  const xPosition = doc.page.width - textWidth;  // Align QR code to the right, considering margin
 
+  doc.moveDown();
+  doc.moveDown();
+
+  doc.font('Helvetica-Bold').fontSize(12).text('TERMS AND CONDITIONS', margin, doc.y);
+  doc.font('Helvetica').fontSize(12).text(`Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+ad minim veniam, q`, margin, doc.y);
+  doc.moveDown();
+
+  doc.font('Helvetica-Bold').fontSize(12).text('DECLARATION', margin, doc.y);
+  doc.font('Helvetica').fontSize(12).text(`Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+ad minim veniam, q`, margin, doc.y);
+  doc.moveDown();
+
+  // Left-aligned text: "Received in good condition"
+  doc.font('Helvetica-Bold').fontSize(12).text( 'Received The Item In Good Condition', margin, doc.y, { align: 'left' });
+  // Right-aligned text: "XCompany"
+  doc.font('Helvetica-Bold').fontSize(12).text(demoRegular.companyDetails.CompanyName, margin, doc.y -10, { align: 'right', width: xPosition });
+
+  doc.moveDown()
+  const imageBuffer = await loadImageFromS3(demoRegular.InvoiceSettings.RegularInvoiceSignatureFileName);
+  if (imageBuffer) {
+    doc.image(imageBuffer, doc.page.width - margin - 80, doc.y, { width: 80, align: "right" });  // Adjust position and size accordingly
+  doc.moveDown()
+  doc.moveDown()
+  doc.moveDown()
+
+
+  }
+  doc.font('Helvetica').fontSize(12).text('Customer Name and Signature', margin, doc.y, { align: 'left', width: xPosition });
+  doc.font('Helvetica').fontSize(12).text('Authorized Signature', margin, doc.y -10, { align: 'right', width: xPosition });
+
+}
 // Example usage:
